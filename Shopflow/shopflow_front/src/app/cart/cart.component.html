@@ -1,0 +1,162 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  
+  <!-- Page Header -->
+  <div class="mb-12 animate-fade-in">
+    <h1 class="text-4xl font-heading font-black text-slate-900 tracking-tight mb-2">Mon Panier</h1>
+    <p class="text-slate-500 font-medium" *ngIf="cart">
+      {{ cart.items.length > 0 ? 'Vous avez sélectionné ' + cart.items.length + ' pépites.' : 'Votre sélection est vide pour le moment.' }}
+    </p>
+  </div>
+  
+  <!-- Loading & Errors -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-20 bg-white/50 rounded-[40px] border border-dashed border-slate-200 animate-pulse">
+    <div class="animate-spin text-shopflow-primary mb-4">
+      <mat-icon class="text-4xl w-10 h-10">autorenew</mat-icon>
+    </div>
+    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Mise à jour du panier...</p>
+  </div>
+
+  <div *ngIf="error" class="bg-red-50 border border-red-100 text-red-600 p-6 rounded-3xl mb-8 flex items-center gap-4 animate-shake">
+    <mat-icon>error_outline</mat-icon>
+    <span class="font-medium">{{ error }}</span>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex flex-col lg:flex-row gap-10" *ngIf="cart && !loading">
+    
+    <!-- Liste des Articles -->
+    <div class="flex-1 space-y-6">
+      
+      <div *ngIf="cart.items.length > 0" class="space-y-4">
+        <div *ngFor="let item of cart.items" 
+          class="group bg-white rounded-[32px] p-6 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300">
+          
+          <div class="flex flex-col sm:flex-row items-center gap-6">
+            <!-- Image Produit -->
+            <div class="w-24 h-24 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 shadow-inner group-hover:bg-shopflow-primary/5 transition-colors overflow-hidden">
+              <img *ngIf="item.productImage" [src]="item.productImage" [alt]="item.productName" class="w-full h-full object-cover">
+              <mat-icon *ngIf="!item.productImage" class="scale-150">image</mat-icon>
+            </div>
+
+            <!-- Détails Produit -->
+            <div class="flex-1 text-center sm:text-left">
+              <h3 class="text-lg font-bold text-slate-800 group-hover:text-shopflow-primary transition-colors">{{ item.productName }}</h3>
+              <p *ngIf="item.variantLabel" class="text-xs font-black text-shopflow-primary uppercase tracking-widest mt-1">
+                {{ item.variantLabel }}
+              </p>
+              <p class="text-sm text-slate-400 mt-2 font-medium">{{ item.unitPrice | currency:'EUR' }} l'unité</p>
+            </div>
+
+            <!-- Sélecteur de Quantité -->
+            <div class="flex items-center bg-slate-50 rounded-2xl p-1 shadow-inner border border-slate-100">
+              <button (click)="updateQuantity(item.itemId, item.quantity - 1)" [disabled]="item.quantity <= 1"
+                class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-shopflow-primary disabled:opacity-30 transition-colors">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <span class="w-12 text-center font-black text-slate-800">{{ item.quantity }}</span>
+              <button (click)="updateQuantity(item.itemId, item.quantity + 1)"
+                class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-shopflow-primary transition-colors">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+            <!-- Total Ligne -->
+            <div class="min-w-[100px] text-center sm:text-right">
+              <p class="text-xl font-black text-slate-900">{{ item.lineTotal | currency:'EUR' }}</p>
+            </div>
+
+            <!-- Supprimer -->
+            <button (click)="removeItem(item.itemId)"
+              class="w-12 h-12 flex items-center justify-center text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panier Vide -->
+      <div *ngIf="cart.items.length === 0" class="flex flex-col items-center justify-center py-32 bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
+        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center text-slate-200 mb-6 shadow-inner">
+          <mat-icon class="scale-[2.5]">shopping_cart</mat-icon>
+        </div>
+        <h3 class="text-xl font-bold text-slate-400">Votre panier est vide</h3>
+        <p class="text-slate-500 mt-2 mb-8 text-center px-6">Il est temps de dénicher quelques trésors dans notre catalogue.</p>
+        <a routerLink="/products" class="bg-shopflow-primary text-white px-10 py-4 rounded-2xl font-bold shadow-xl shadow-shopflow-primary/30 hover:scale-105 transition-transform">
+          Explorer le catalogue
+        </a>
+      </div>
+    </div>
+
+    <!-- Récapitulatif -->
+    <div class="w-full lg:w-[400px]" *ngIf="cart.items.length > 0">
+      <div class="glass p-8 rounded-[40px] shadow-2xl border border-white/40 sticky top-24">
+        <h2 class="text-2xl font-black text-slate-900 mb-8 tracking-tight">Récapitulatif</h2>
+        
+        <div class="space-y-4 mb-8">
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-slate-500 font-medium">Sous-total</span>
+            <span class="text-slate-900 font-bold">{{ cart.subTotal | currency:'EUR' }}</span>
+          </div>
+          
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-slate-500 font-medium">Frais de livraison</span>
+            <span *ngIf="cart.shippingFees === 0" class="text-green-500 font-black uppercase text-[10px] tracking-widest bg-green-50 px-2 py-1 rounded-md">Offerts</span>
+            <span *ngIf="cart.shippingFees > 0" class="text-slate-900 font-bold">{{ cart.shippingFees | currency:'EUR' }}</span>
+          </div>
+
+          <!-- Coupon -->
+          <div class="pt-4 border-t border-slate-100 mt-4">
+            <div *ngIf="cart.couponCode" class="bg-shopflow-primary/5 p-4 rounded-2xl flex items-center justify-between group">
+              <div class="flex items-center gap-3">
+                <mat-icon class="text-shopflow-primary">local_offer</mat-icon>
+                <div>
+                  <p class="text-[10px] font-black text-shopflow-primary uppercase tracking-widest">Code Actif</p>
+                  <p class="text-sm font-bold text-slate-800">{{ cart.couponCode }}</p>
+                </div>
+              </div>
+              <button (click)="removeCoupon()" class="text-slate-300 hover:text-red-500 transition-colors">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </div>
+            
+            <div *ngIf="!cart.couponCode" class="space-y-3">
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Code Promo</p>
+              <div class="flex gap-2">
+                <input type="text" [(ngModel)]="couponInput" placeholder="Saisir ici..." 
+                  class="flex-1 bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-shopflow-primary/20 outline-none transition-all">
+                <button (click)="applyCoupon()" 
+                  class="btn-premium px-4 py-3">
+                  Appliquer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total -->
+        <div class="pt-6 border-t-2 border-dashed border-slate-100 mb-8 flex justify-between items-end">
+          <div>
+            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Total TTC</p>
+            <p class="text-4xl font-black text-slate-900">{{ cart.totalTTC | currency:'EUR' }}</p>
+          </div>
+          <div class="flex flex-col items-end opacity-40">
+            <mat-icon class="scale-125">verified_user</mat-icon>
+            <span class="text-[8px] font-bold uppercase tracking-tighter">Secure Checkout</span>
+          </div>
+        </div>
+
+        <button (click)="checkout()" [disabled]="!cart || cart.items.length === 0 || loading"
+          class="w-full btn-premium btn-premium-primary py-5 !text-lg shadow-2xl">
+          Finaliser ma commande
+          <mat-icon class="group-hover:translate-x-1 transition-transform">arrow_forward</mat-icon>
+        </button>
+
+        <p class="text-center text-[10px] text-slate-400 font-medium mt-6">
+          Paiement sécurisé par cryptage SSL de bout en bout.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+

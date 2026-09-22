@@ -1,0 +1,93 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      
+      <!-- En-tête -->
+      <div class="mb-10 animate-fade-in">
+        <h1 class="text-4xl font-heading font-black text-slate-900 mb-2 tracking-tight">Bonjour !</h1>
+        <p class="text-slate-500 font-medium italic">Ravi de vous revoir dans votre espace ShopFlow.</p>
+      </div>
+
+      <!-- États de chargement/erreur -->
+      <div *ngIf="loading" class="flex flex-col items-center justify-center py-20 bg-white/50 rounded-[40px] border border-dashed border-slate-200">
+        <div class="animate-spin text-shopflow-primary mb-4">
+          <mat-icon class="text-4xl w-10 h-10">autorenew</mat-icon>
+        </div>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Synchronisation de vos données...</p>
+      </div>
+
+      <div *ngIf="error" class="bg-red-50 border border-red-100 text-red-600 p-6 rounded-3xl mb-8 flex items-center gap-4">
+        <mat-icon>error_outline</mat-icon>
+        <span class="font-medium">{{ error }}</span>
+      </div>
+
+      <!-- Statistiques Principales -->
+      <div *ngIf="stats && !loading" class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        
+        <!-- Carte Dépenses -->
+        <div class="glass p-8 rounded-[40px] shadow-xl border border-white/40 flex items-center gap-6 group hover:scale-[1.02] transition-transform duration-300">
+          <div class="w-16 h-16 rounded-3xl bg-green-500/10 text-green-600 flex items-center justify-center shadow-inner">
+            <mat-icon class="text-3xl">payments</mat-icon>
+          </div>
+          <div>
+            <p class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Dépenses Totales</p>
+            <h2 class="text-3xl font-black text-slate-900 group-hover:text-shopflow-primary transition-colors">
+              {{ (stats.totalSpent || 0) | currency:'EUR' }}
+            </h2>
+          </div>
+        </div>
+
+        <!-- Carte Commandes -->
+        <div class="glass p-8 rounded-[40px] shadow-xl border border-white/40 flex items-center gap-6 group hover:scale-[1.02] transition-transform duration-300">
+          <div class="w-16 h-16 rounded-3xl bg-shopflow-primary/10 text-shopflow-primary flex items-center justify-center shadow-inner">
+            <mat-icon class="text-3xl">local_shipping</mat-icon>
+          </div>
+          <div>
+            <p class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Commandes Passées</p>
+            <h2 class="text-3xl font-black text-slate-900 group-hover:text-shopflow-secondary transition-colors">
+              {{ stats.totalOrders || 0 }}
+            </h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historique Récent -->
+      <div *ngIf="stats && !loading" class="bg-white rounded-[40px] p-10 border border-slate-100 shadow-sm">
+        <div class="flex items-center justify-between mb-8">
+          <h3 class="text-2xl font-bold text-slate-800">Dernières Commandes</h3>
+          <button class="text-shopflow-primary font-bold text-sm hover:underline">Tout voir</button>
+        </div>
+
+        <div *ngIf="stats.currentOrders && stats.currentOrders.length > 0" class="space-y-4">
+          <div *ngFor="let order of stats.currentOrders" 
+            class="flex items-center justify-between p-6 bg-slate-50 hover:bg-white border border-transparent hover:border-slate-100 hover:shadow-lg rounded-3xl transition-all group">
+            
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-white overflow-hidden flex items-center justify-center text-slate-400 group-hover:text-shopflow-primary transition-colors shadow-sm border border-slate-50">
+                <img [src]="order.productImage || 'https://images.unsplash.com/photo-1566576721346-d4a3b4eaad5b?q=80&w=100&auto=format&fit=crop'" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <p class="font-bold text-slate-800">{{ order.orderNumber }}</p>
+                <p class="text-xs text-slate-400 font-medium">{{ order.createdAt | date:'longDate' }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-8">
+              <div class="flex flex-col items-end">
+                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
+                  [class]="order.status === 'DELIVERED' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'">
+                  {{ order.status }}
+                </span>
+              </div>
+              <span class="text-lg font-black text-slate-900">{{ order.total | currency:'EUR' }}</span>
+              <mat-icon class="text-slate-300 group-hover:text-shopflow-primary transition-colors">chevron_right</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!stats.currentOrders || stats.currentOrders.length === 0" class="text-center py-10">
+          <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-4">
+            <mat-icon class="text-4xl">shopping_basket</mat-icon>
+          </div>
+          <p class="text-slate-400 font-medium">Vous n'avez pas encore passé de commande.</p>
+        </div>
+      </div>
+    </div>

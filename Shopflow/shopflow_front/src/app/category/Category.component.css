@@ -1,0 +1,98 @@
+/* ============================================================
+   Styles — CategoryComponent Modern
+   ============================================================ */
+
+.category-page { min-height: 80vh; }
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.category-card {
+  border-radius: 10px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.6rem;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #2c3e50;
+}
+
+.parent-badge,
+.root-badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.parent-badge { background: #eef2ff; color: #667eea; }
+.root-badge   { background: #e8f5e9; color: #27ae60; }
+
+.card-desc {
+  font-size: 0.88rem;
+  color: #555;
+  margin: 0 0 0.8rem 0;
+}
+
+.text-muted { color: #aaa !important; font-style: italic; }
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Boutons */
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: opacity 0.2s, transform 0.1s;
+  text-decoration: none;
+}
+
+.btn:hover:not(:disabled) { opacity: 0.85; }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary   { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+.btn-secondary { background: #6c757d; color: #fff; }
+.btn-warning   { background: #f39c12; color: #fff; }
+.btn-danger    { background: #e74c3c; color: #fff; }
+.btn-sm        { padding: 0.3rem 0.7rem; font-size: 0.82rem; }
+
+/* État vide */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .category-container { padding: 1rem; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+  .category-grid { grid-template-columns: 1fr; }
+}

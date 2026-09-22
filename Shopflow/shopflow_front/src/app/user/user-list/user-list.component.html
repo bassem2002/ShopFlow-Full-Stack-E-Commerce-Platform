@@ -1,0 +1,87 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      
+      <!-- Header -->
+      <div class="mb-10 animate-fade-in">
+        <h1 class="text-4xl font-heading font-black text-slate-900 tracking-tight mb-2">Gestion des Utilisateurs</h1>
+        <p class="text-slate-500 font-medium">Gérez les comptes, les rôles et les accès de la plateforme ShopFlow.</p>
+      </div>
+
+      <!-- Loading & Errors -->
+      <div *ngIf="loading" class="flex flex-col items-center justify-center py-20 bg-white/50 rounded-[40px] border border-dashed border-slate-200 animate-pulse">
+        <div class="animate-spin text-shopflow-primary mb-4">
+          <mat-icon class="text-4xl w-10 h-10">autorenew</mat-icon>
+        </div>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Chargement des membres...</p>
+      </div>
+
+      <div *ngIf="error" class="bg-red-50 border border-red-100 text-red-600 p-6 rounded-3xl mb-8 flex items-center gap-4">
+        <mat-icon>error_outline</mat-icon>
+        <span class="font-medium">{{ error }}</span>
+      </div>
+
+      <!-- User Grid/Table -->
+      <div *ngIf="!loading && users.length > 0" class="glass rounded-[40px] overflow-hidden shadow-2xl border border-white/40">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-900/5 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black">
+                <th class="px-8 py-6">Utilisateur</th>
+                <th class="px-8 py-6">Contact</th>
+                <th class="px-8 py-6 text-center">Rôle</th>
+                <th class="px-8 py-6 text-center">Statut</th>
+                <th class="px-8 py-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr *ngFor="let user of users" class="hover:bg-white/40 transition-colors group">
+                <td class="px-8 py-6">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-shopflow-primary to-shopflow-secondary flex items-center justify-center text-white font-black text-lg shadow-lg group-hover:scale-110 transition-transform">
+                      {{ user.firstName[0] }}{{ user.lastName[0] }}
+                    </div>
+                    <div>
+                      <p class="font-bold text-slate-800 text-lg">{{ user.firstName }} {{ user.lastName }}</p>
+                      <p class="text-xs text-slate-400 font-medium">ID: #{{ user.id }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-8 py-6 font-medium text-slate-600">
+                  {{ user.email }}
+                </td>
+                <td class="px-8 py-6 text-center">
+                  <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest inline-block"
+                    [ngClass]="{
+                      'bg-red-100 text-red-600': user.role === 'ADMIN',
+                      'bg-amber-100 text-amber-600': user.role === 'SELLER',
+                      'bg-blue-100 text-blue-600': user.role === 'CUSTOMER'
+                    }">
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td class="px-8 py-6 text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <span class="w-2 h-2 rounded-full" [class]="user.active ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-slate-300'"></span>
+                    <span class="text-sm font-bold" [class]="user.active ? 'text-slate-800' : 'text-slate-400'">
+                      {{ user.active ? 'Actif' : 'Bloqué' }}
+                    </span>
+                  </div>
+                </td>
+                <td class="px-8 py-6 text-right">
+                  <button (click)="toggleStatus(user)" 
+                    class="px-6 py-2 rounded-xl font-bold text-xs transition-all border-2"
+                    [ngClass]="user.active ? 'border-red-100 text-red-500 hover:bg-red-50' : 'border-green-100 text-green-500 hover:bg-green-50'">
+                    {{ user.active ? 'Désactiver' : 'Réactiver' }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && users.length === 0" class="flex flex-col items-center justify-center py-32 bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
+        <mat-icon class="text-6xl text-slate-200 mb-4 h-16 w-16">people_outline</mat-icon>
+        <h3 class="text-xl font-bold text-slate-400">Aucun utilisateur</h3>
+      </div>
+    </div>

@@ -1,0 +1,134 @@
+<div class="h-full bg-[#f8fafc] flex flex-col overflow-hidden">
+  
+  <!-- Header Minimaliste Compact -->
+  <div class="bg-white border-b border-slate-100 px-6 py-6 flex-shrink-0">
+    <div class="max-w-[1500px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="space-y-0.5">
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Catalogue</h1>
+        <p class="text-slate-400 text-xs font-medium">{{ products.length }} produits disponibles</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Recherche Compacte -->
+        <div class="relative min-w-[250px]">
+          <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()"
+            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-xs focus:ring-2 focus:ring-slate-100 outline-none transition-all pl-10"
+            placeholder="Rechercher...">
+          <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 !text-sm">search</mat-icon>
+        </div>
+        
+        <a *ngIf="isAdminOrSeller" routerLink="/products/new" 
+          class="btn-premium btn-premium-primary">
+          <mat-icon class="!text-sm">add</mat-icon> Nouveau
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-1 max-w-[1500px] mx-auto w-full flex flex-col lg:flex-row gap-8 p-6 overflow-hidden">
+    
+    <!-- Filtres Compacts -->
+    <aside class="w-full lg:w-56 flex-shrink-0 h-full overflow-y-auto scrollbar-hide pb-10">
+      <div class="space-y-8">
+        
+        <div class="space-y-3">
+          <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Rayons</h3>
+          <div class="flex flex-col gap-1">
+            <button (click)="selectedCategoryId = null; onFilter()"
+              [class]="selectedCategoryId === null ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'"
+              class="w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all">
+              Tous les produits
+            </button>
+            <button *ngFor="let cat of categories" (click)="selectedCategoryId = cat.id; onFilter()"
+              [class]="selectedCategoryId === cat.id ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'"
+              class="w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex justify-between items-center group">
+              <span>{{ cat.name }}</span>
+              <mat-icon *ngIf="selectedCategoryId === cat.id" class="!text-xs">check</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-4 pt-2">
+          <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Prix Max ({{ maxPrice }}€)</h3>
+          <div class="px-1">
+            <input type="range" min="0" max="5000" step="50" [(ngModel)]="maxPrice" (input)="onFilter()"
+              class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900">
+            <div class="flex justify-between mt-3 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+              <span>0 €</span>
+              <span>5000+ €</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Offres</h3>
+          <button (click)="onlyPromo = !onlyPromo; onFilter()"
+            [class]="onlyPromo ? 'bg-rose-50 text-rose-600' : 'text-slate-500 hover:bg-slate-50'"
+            class="w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+            <mat-icon class="!text-xs">{{ onlyPromo ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+            Promotions uniquement
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Grille de Produits Compacte -->
+    <main class="flex-1 h-full overflow-y-auto scrollbar-hide pb-20">
+      
+      <div *ngIf="loading" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+        <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]" class="space-y-3 animate-pulse">
+          <div class="aspect-square bg-slate-200 rounded-xl"></div>
+          <div class="h-3 bg-slate-200 rounded-full w-2/3"></div>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && !error" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-10">
+        
+        <div *ngFor="let product of products" (click)="viewProduct(product.id)" class="group cursor-pointer flex flex-col">
+          <div class="relative aspect-square overflow-hidden bg-slate-100 rounded-2xl mb-3">
+            <img [src]="product.images[0] || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=400&h=400&auto=format&fit=crop'" 
+                 [alt]="product.name" 
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+            
+            <div *ngIf="product.stock <= 0" class="absolute top-2 right-2 bg-white/90 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest text-slate-900 shadow-sm">
+              Rupture
+            </div>
+            <div *ngIf="product.stock > 0" class="absolute top-2 right-2 bg-white/90 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest text-slate-900 shadow-sm">
+              Stock: {{ product.stock }}
+            </div>
+
+            <button *ngIf="!isAdminOrSeller" (click)="$event.stopPropagation(); addToCart(product)" 
+              class="absolute bottom-4 left-4 right-4 bg-white py-2 rounded-lg shadow-xl font-bold text-[10px] uppercase tracking-widest opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-slate-900 hover:text-white">
+              Ajouter
+            </button>
+          </div>
+          
+          <div class="space-y-0.5 px-0.5">
+            <div class="flex justify-between items-start gap-2">
+              <h3 class="text-xs font-bold text-slate-900 truncate flex-1 group-hover:underline underline-offset-2">
+                {{ product.name }}
+              </h3>
+              <p class="text-xs font-black text-slate-900">
+                {{ (product.promoPrice || product.price) | currency:'EUR':'symbol':'1.0-2' }}
+              </p>
+            </div>
+            <p class="text-[10px] text-slate-400 line-clamp-1 italic">
+              {{ product.description }}
+            </p>
+            
+            <div *ngIf="isAdminOrSeller" class="flex gap-3 pt-1.5">
+              <a [routerLink]="['/products/edit', product.id]" (click)="$event.stopPropagation()" class="btn-premium btn-premium-outline !text-[8px] !px-2 !py-1">Edit</a>
+              <button (click)="$event.stopPropagation(); onDelete(product.id)" class="btn-premium btn-premium-danger !text-[8px] !px-2 !py-1">Del</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && products.length === 0" class="py-32 text-center space-y-3">
+        <h2 class="text-lg font-bold text-slate-900">Aucun article</h2>
+        <button (click)="selectedCategoryId = null; onFilter()" class="bg-slate-900 text-white px-6 py-2 rounded-lg font-bold text-xs mt-2">Reset</button>
+      </div>
+
+    </main>
+  </div>
+</div>

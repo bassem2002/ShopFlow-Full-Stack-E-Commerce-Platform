@@ -1,0 +1,140 @@
+<mat-toolbar
+  class="glass !fixed top-0 left-0 right-0 z-50 h-[72px] px-4 md:px-10 shadow-sm flex items-center gap-4 border-b border-white/20">
+
+  <!-- Logo (Far Left) -->
+  <div class="flex items-center gap-3 cursor-pointer group flex-none" routerLink="/">
+    <div
+      class="w-11 h-11 rounded-[14px] bg-gradient-to-tr from-shopflow-primary to-shopflow-secondary flex items-center justify-center text-white font-black text-2xl shadow-xl group-hover:shadow-shopflow-primary/50 group-hover:rotate-6 transition-all duration-500">
+      S
+    </div>
+    <span class="text-2xl font-black gradient-text hidden lg:block tracking-tighter">ShopFlow</span>
+  </div>
+
+  <!-- Spacer to separate logo and nav -->
+  <div class="w-4 hidden xl:block"></div>
+
+  <!-- Navigation Desktop (Left-Center) -->
+  <nav class="hidden md:flex items-center gap-1 flex-none">
+    @for (link of navLinks(); track link.path) {
+    <a [routerLink]="link.path" routerLinkActive="!bg-shopflow-primary/5 !text-shopflow-primary font-bold"
+      [routerLinkActiveOptions]="{exact: link.exact || false}"
+      class="px-4 py-2 rounded-xl text-slate-500 hover:text-shopflow-primary hover:bg-slate-50 transition-all text-sm font-bold uppercase tracking-wider">
+      {{ link.label }}
+    </a>
+    }
+  </nav>
+
+  <!-- Search Bar (Center - Expanding) -->
+  <div class="flex-1 max-w-md mx-auto hidden sm:flex items-center relative group">
+    <div class="absolute left-4 text-slate-400 group-focus-within:text-shopflow-primary transition-colors">
+      <mat-icon class="scale-90">search</mat-icon>
+    </div>
+    <input type="text" 
+           [(ngModel)]="searchQuery" 
+           (keyup.enter)="onSearch()"
+           placeholder="Rechercher un produit, une marque..."
+           class="w-full bg-slate-100/50 border-none rounded-2xl py-3 pl-12 pr-4 text-sm font-medium focus:ring-2 focus:ring-shopflow-primary/20 focus:bg-white transition-all outline-none text-slate-700">
+  </div>
+
+  <!-- Actions (Far Right) -->
+  <div class="flex items-center gap-2 md:gap-4 flex-none ml-auto">
+    
+    <!-- Bouton Panier -->
+    <button *ngIf="userRole() === 'CUSTOMER' || userRole() === 'GUEST'" routerLink="/cart" mat-icon-button class="!w-12 !h-12 !rounded-2xl hover:bg-slate-50 relative group">
+      <mat-icon class="text-slate-600 group-hover:text-shopflow-primary transition-colors">shopping_basket</mat-icon>
+      <span *ngIf="cartItemCount() > 0" 
+            class="absolute top-2 right-2 w-5 h-5 bg-shopflow-secondary text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-bounce-subtle">
+        {{ cartItemCount() }}
+      </span>
+    </button>
+
+    <!-- Avatar / Menu Profil -->
+    @if (userRole() !== 'GUEST') {
+      <button mat-button [matMenuTriggerFor]="profileMenu"
+        class="!rounded-2xl !h-12 !px-3 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-shopflow-primary to-shopflow-secondary text-white flex items-center justify-center font-black text-xs shadow-md">
+            {{ userRole() | slice:0:1 }}
+          </div>
+          <div class="hidden lg:flex flex-col items-start leading-none text-left">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Espace</span>
+            <span class="text-xs font-bold text-slate-700">{{ userRole() }}</span>
+          </div>
+          <mat-icon class="text-slate-400 scale-75">expand_more</mat-icon>
+        </div>
+      </button>
+
+      <mat-menu #profileMenu="matMenu" class="premium-menu">
+        <div class="px-6 py-4 border-b border-slate-50 mb-1">
+          <p class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Session Active</p>
+          <p class="text-sm font-bold text-slate-900">Utilisateur ShopFlow</p>
+        </div>
+
+        <button mat-menu-item (click)="userRole() === 'CUSTOMER' ? router.navigate(['/dashboard/customer']) : (userRole() === 'SELLER' ? router.navigate(['/dashboard/seller']) : router.navigate(['/dashboard/admin']))">
+          <mat-icon class="text-slate-400">dashboard_customize</mat-icon>
+          <span class="font-bold text-slate-700 text-sm">Tableau de Bord</span>
+        </button>
+
+        <button mat-menu-item routerLink="/orders">
+          <mat-icon class="text-slate-400">local_shipping</mat-icon>
+          <span class="font-bold text-slate-700 text-sm">Commandes</span>
+        </button>
+
+        <button mat-menu-item routerLink="/profile">
+          <mat-icon class="text-slate-400">settings_account_box</mat-icon>
+          <span class="font-bold text-slate-700 text-sm">Mon Profil</span>
+        </button>
+
+        <div class="h-px bg-slate-50 my-2 mx-4"></div>
+
+        <button mat-menu-item (click)="logout()" class="!text-rose-600">
+          <mat-icon class="!text-rose-600">power_settings_new</mat-icon>
+          <span class="font-black text-sm uppercase tracking-widest">Déconnexion</span>
+        </button>
+      </mat-menu>
+    } @else {
+      <!-- Login Button for Guest -->
+      <button routerLink="/login" class="hidden sm:flex items-center gap-2 bg-slate-900 text-white px-6 py-2.5 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-shopflow-primary transition-all shadow-lg shadow-slate-900/10">
+        <mat-icon class="scale-75">login</mat-icon>
+        Connexion
+      </button>
+    }
+
+    <!-- Mobile Menu Toggle -->
+    <button mat-icon-button class="md:hidden !w-12 !h-12 !rounded-2xl bg-slate-100 text-slate-600" (click)="toggleMobileMenu()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>
+
+<!-- Mobile Sidebar (Improved) -->
+@if (isMobileMenuOpen()) {
+<div class="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-md md:hidden animate-fade-in" (click)="toggleMobileMenu()"></div>
+<div class="fixed inset-y-0 right-0 z-[70] w-72 bg-white shadow-2xl p-8 md:hidden flex flex-col animate-slide-left">
+  <div class="flex justify-between items-center mb-10">
+    <span class="font-black text-2xl tracking-tighter text-slate-900">Menu</span>
+    <button mat-icon-button (click)="toggleMobileMenu()" class="bg-slate-50 rounded-xl"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <nav class="flex flex-col gap-2 mb-auto">
+    @for (link of navLinks(); track link.path) {
+    <a [routerLink]="link.path"
+      class="flex items-center justify-between p-4 rounded-2xl text-slate-600 hover:text-shopflow-primary hover:bg-slate-50 transition-all font-bold text-sm uppercase tracking-widest border border-transparent hover:border-slate-100"
+      (click)="toggleMobileMenu()">
+      {{ link.label }}
+      <mat-icon class="scale-75 opacity-20">chevron_right</mat-icon>
+    </a>
+    }
+  </nav>
+
+  @if (userRole() === 'GUEST') {
+    <button routerLink="/login" (click)="toggleMobileMenu()" class="w-full bg-shopflow-primary text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-shopflow-primary/20 mb-4">
+      Connexion
+    </button>
+  } @else {
+    <button (click)="logout()" class="w-full border-2 border-rose-100 text-rose-500 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-rose-50 transition-colors">
+      Quitter
+    </button>
+  }
+</div>
+}

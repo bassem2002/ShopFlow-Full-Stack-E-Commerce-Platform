@@ -1,0 +1,47 @@
+# Java / Maven
+**/target/
+*.class
+.mvn/
+data/
+
+# Angular / Node
+**/node_modules/
+**/dist/
+.angular/
+.angular.cache/
+
+# IDE / Editor
+.idea/
+.vscode/
+.vs/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Firebase Admin credentials
+serviceAccountKey.json
+**/serviceAccountKey.json
+
+# Certificates / keys
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3

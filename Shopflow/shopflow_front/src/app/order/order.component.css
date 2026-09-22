@@ -1,0 +1,150 @@
+/* ============================================================
+   Styles — OrderComponent Modern
+   ============================================================ */
+
+.order-page { min-height: 80vh; }
+
+/* Modern Table Styling */
+.modern-table { width: 100%; border-collapse: collapse; }
+.modern-table th { 
+  padding: 1.25rem 1.5rem; 
+  background: var(--background); 
+  font-size: 0.75rem; 
+  text-transform: uppercase; 
+  letter-spacing: 0.05em; 
+  color: var(--text-muted); 
+  border-bottom: 1px solid var(--border);
+}
+.modern-table td { 
+  padding: 1.25rem 1.5rem; 
+  border-bottom: 1px solid var(--border); 
+  vertical-align: middle; 
+  font-size: 0.9375rem;
+}
+.modern-table tr:last-child td { border-bottom: none; }
+.modern-table tr:hover { background: rgba(0,0,0,0.01); }
+
+/* Overlay & Modal */
+.detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.detail-modal {
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: none;
+}
+
+.btn-close-modal {
+  background: var(--background);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-close-modal:hover { background: var(--border); }
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  background: var(--background);
+  padding: 1.25rem;
+  border-radius: var(--radius);
+}
+
+.info-item { display: flex; flex-direction: column; }
+.info-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem; }
+.info-value { font-weight: 600; color: var(--text-main); }
+
+/* Item List */
+.order-item-row { display: flex; justify-content: space-between; align-items: center; }
+.item-main { display: flex; gap: 1rem; align-items: center; }
+.item-qty { font-weight: 700; color: var(--primary); min-width: 30px; }
+.item-text { display: flex; flex-direction: column; }
+.item-name { font-weight: 600; color: var(--text-main); }
+.item-price { font-weight: 700; }
+
+/* Summary */
+.price-summary { border: 1px solid var(--border); }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9375rem; color: var(--text-muted); }
+.total-line { font-size: 1.125rem; color: var(--text-main); }
+
+/* Status Badges */
+.status-pending { background: #fef3c7 !important; color: #92400e !important; }
+.status-paid { background: #d1fae5 !important; color: #065f46 !important; }
+.status-processing { background: #dbeafe !important; color: #1e40af !important; }
+.status-shipped { background: #ede9fe !important; color: #5b21b6 !important; }
+.status-delivered { background: #d1fae5 !important; color: #065f46 !important; }
+.status-cancelled { background: #fee2e2 !important; color: #991b1b !important; }
+
+/* Custom Scrollbar for Modal */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+/* Animations */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.empty-icon { font-size: 4rem; opacity: 0.2; }
+.spinner { 
+  width: 40px; height: 40px; 
+  border: 4px solid var(--border); 
+  border-top-color: var(--primary); 
+  border-radius: 50%; 
+  animation: spin 1s linear infinite; 
+  margin: 0 auto; 
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.text-end { text-align: right; }
+.text-center { text-align: center; }
+.fw-bold { font-weight: 700; }
+

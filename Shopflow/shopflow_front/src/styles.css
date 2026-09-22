@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  --shopflow-primary: #4f46e5; /* Indigo 600 */
+  --shopflow-secondary: #0ea5e9; /* Sky 500 */
+  --shopflow-accent: #f43f5e; /* Rose 500 */
+  --shopflow-bg: #f8fafc;
+  
+  /* Design System Variables */
+  --primary: #4f46e5;
+  --background: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --radius: 12px;
+}
+
+@layer components {
+  .btn-premium {
+    @apply px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2;
+    @apply bg-slate-900 text-white shadow-lg hover:bg-black hover:scale-[1.02] hover:shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-premium-primary {
+    @apply bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/20;
+  }
+
+  .btn-premium-secondary {
+    @apply bg-sky-500 hover:bg-sky-600 shadow-sky-500/20;
+  }
+
+  .btn-premium-outline {
+    @apply bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm hover:shadow-md;
+  }
+  
+  .btn-premium-danger {
+    @apply bg-rose-50 border border-rose-100 text-rose-600 hover:bg-rose-100 hover:border-rose-200 shadow-none;
+  }
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--shopflow-bg);
+  scroll-behavior: smooth;
+  overflow: hidden; /* Empêche le défilement du body */
+}
+
+/* --- Utilitaires --- */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+/* --- Effets Spéciaux Arctic --- */
+.glass {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* --- Overrides Angular Material (Style M3) --- */
+.mat-mdc-card {
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+.mat-mdc-button,
+.mat-mdc-flat-button {
+  border-radius: 9999px !important;
+  /* Boutons capsules pour le look 2026 */
+  font-weight: 600 !important;
+  letter-spacing: 0.2px !important;
+}
+
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-container-shape: 12px;
+}
+
+/* --- Animations Modernes --- */
+/* --- Overrides pour les Menus (Overlay) --- */
+.mat-mdc-menu-panel {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-up { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Animation de fond */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}

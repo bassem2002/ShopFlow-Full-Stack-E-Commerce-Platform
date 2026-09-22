@@ -1,0 +1,102 @@
+<div class="h-full bg-white flex flex-col lg:flex-row overflow-hidden">
+      
+      <!-- Left Side: Hero/Welcome -->
+      <div class="lg:w-1/2 p-8 md:p-12 lg:p-20 flex flex-col justify-center bg-slate-900 relative overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden opacity-20">
+          <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-shopflow-primary rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
+        </div>
+
+        <div class="max-w-md mx-auto w-full animate-fade-in relative z-10">
+          <div class="flex items-center gap-4 mb-12">
+            <div class="w-10 h-10 bg-white text-slate-900 rounded-2xl flex items-center justify-center shadow-lg">
+              <mat-icon class="!text-sm">bolt</mat-icon>
+            </div>
+            <span class="text-xl font-black tracking-tighter text-white uppercase">ShopFlow</span>
+          </div>
+
+          <h1 class="text-4xl font-heading font-black text-white mb-4 tracking-tight leading-tight">
+            Heureux de vous <span class="text-shopflow-primary italic">revoir.</span>
+          </h1>
+          <p class="text-slate-400 text-sm font-medium leading-relaxed">
+            Connectez-vous pour gérer vos activités.
+          </p>
+          
+          <div class="mt-12 grid grid-cols-2 gap-4 border-t border-white/10 pt-8">
+            <div>
+              <p class="text-2xl font-black text-white">100%</p>
+              <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Sécurisé</p>
+            </div>
+            <div>
+              <p class="text-2xl font-black text-white">24/7</p>
+              <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Support</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Login Form -->
+      <div class="lg:w-1/2 p-6 md:p-12 lg:p-20 flex flex-col justify-center bg-white relative overflow-hidden">
+        <div class="max-w-md mx-auto w-full animate-fade-in delay-100">
+          <div class="mb-8">
+            <h2 class="text-3xl font-black text-slate-900 mb-2 tracking-tight">Connexion</h2>
+            <p class="text-slate-500 text-xs font-medium italic">Entrez vos identifiants.</p>
+          </div>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+            <div class="space-y-1">
+              <label class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Email</label>
+              <div class="relative group">
+                <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-shopflow-primary transition-colors !text-sm">mail</mat-icon>
+                <input type="email" formControlName="email" placeholder="john@example.com" 
+                  class="w-full pl-12 pr-6 py-3 bg-slate-50/50 border-2 border-slate-100 rounded-2xl focus:border-shopflow-primary focus:bg-white outline-none transition-all font-medium text-sm">
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex justify-between items-center px-4">
+                <label class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Mot de passe</label>
+                <a routerLink="/forgot-password" class="text-[9px] font-black uppercase tracking-[0.2em] text-shopflow-primary hover:underline">Oublié ?</a>
+              </div>
+              <div class="relative group">
+                <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-shopflow-primary transition-colors !text-sm">lock</mat-icon>
+                <input [type]="hidePassword() ? 'password' : 'text'" formControlName="password" placeholder="••••••••" 
+                  class="w-full pl-12 pr-12 py-3 bg-slate-50/50 border-2 border-slate-100 rounded-2xl focus:border-shopflow-primary focus:bg-white outline-none transition-all font-medium text-sm">
+                <button type="button" (click)="togglePasswordVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-shopflow-primary">
+                  <mat-icon class="!text-sm">{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 px-4 py-2">
+              <mat-checkbox color="primary" class="scale-75"></mat-checkbox>
+              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-pointer">Se souvenir de moi</span>
+            </div>
+
+            <!-- Error -->
+            <div *ngIf="errorMessage()" class="p-3 bg-red-50 text-red-600 rounded-xl flex items-center gap-2 animate-shake text-xs font-bold">
+              <mat-icon class="!text-sm">error_outline</mat-icon>
+              <span>{{ errorMessage() }}</span>
+            </div>
+
+            <!-- Action -->
+            <div class="pt-4 space-y-4">
+              <button type="submit" [disabled]="loginForm.invalid || isLoading()" 
+                class="w-full btn-premium btn-premium-primary py-4 !text-sm">
+                <span *ngIf="!isLoading()">Se connecter</span>
+                <div *ngIf="isLoading()" class="flex items-center justify-center gap-2">
+                  <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Vérification...</span>
+                </div>
+              </button>
+
+              <div *ngIf="!isAuthenticated()" class="text-center">
+                <p class="text-slate-400 text-xs font-medium">
+                  Pas membre ? 
+                  <a routerLink="/register" class="text-slate-900 font-black hover:underline ml-1">Rejoindre</a>
+                </p>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>

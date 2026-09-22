@@ -1,0 +1,162 @@
+<div class="min-h-screen bg-slate-50">
+      <!-- Hero Section -->
+      <section class="relative h-[400px] flex items-center justify-center overflow-hidden bg-slate-900">
+        <div class="absolute inset-0 z-0 opacity-40">
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop" 
+               alt="Background" class="w-full h-full object-cover">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent z-10"></div>
+        
+        <div class="relative z-20 text-center px-4 max-w-4xl mx-auto">
+          <span class="inline-block px-4 py-1 rounded-full bg-shopflow-primary/20 text-shopflow-primary text-[10px] font-black uppercase tracking-widest mb-6 animate-fade-in">
+            Bienvenue sur ShopFlow
+          </span>
+          <h1 class="text-4xl md:text-5xl font-heading font-black text-white mb-4 leading-tight animate-slide-up">
+            L'Élégance du Commerce <br> 
+            <span class="text-shopflow-primary">Connecté</span>
+          </h1>
+          <p class="text-sm md:text-base text-slate-300 mb-8 max-w-xl mx-auto font-medium animate-fade-in delay-200">
+            Découvrez une sélection exclusive de produits premium. 
+            Une expérience de shopping fluide et sécurisée.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-5 animate-fade-in delay-300">
+            <button class="btn-premium btn-premium-primary !px-10 !py-5 shadow-2xl shadow-shopflow-primary/40" routerLink="/products">
+              <mat-icon class="scale-90">rocket_launch</mat-icon>
+              Explorer le catalogue
+            </button>
+            <button *ngIf="isGuest()" class="btn-premium !bg-white/5 !border-white/20 !text-white !px-10 !py-5 backdrop-blur-md hover:!bg-white/10" routerLink="/register">
+              <mat-icon class="scale-90">person_add</mat-icon>
+              S'inscrire maintenant
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats / Features -->
+      <section class="py-12 px-4 -mt-12 relative z-30">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="glass p-8 rounded-[40px] border border-white/40 shadow-xl hover:-translate-y-2 transition-all duration-500">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-6">
+              <mat-icon class="!text-2xl">local_shipping</mat-icon>
+            </div>
+            <h3 class="text-xl font-black text-slate-900 mb-2">Livraison Express</h3>
+            <p class="text-sm text-slate-500 font-medium leading-relaxed">Expédition prioritaire mondiale en 48h.</p>
+          </div>
+          <div class="glass p-8 rounded-[40px] border border-white/40 shadow-xl hover:-translate-y-2 transition-all duration-500">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center mb-6">
+              <mat-icon class="!text-2xl">verified_user</mat-icon>
+            </div>
+            <h3 class="text-xl font-black text-slate-900 mb-2">Sécurité Garantie</h3>
+            <p class="text-sm text-slate-500 font-medium leading-relaxed">Transactions 100% sécurisées et chiffrées.</p>
+          </div>
+          <div class="glass p-8 rounded-[40px] border border-white/40 shadow-xl hover:-translate-y-2 transition-all duration-500">
+            <div class="w-12 h-12 rounded-2xl bg-pink-50 text-shopflow-secondary flex items-center justify-center mb-6">
+              <mat-icon class="!text-2xl">star</mat-icon>
+            </div>
+            <h3 class="text-xl font-black text-slate-900 mb-2">Qualité Premium</h3>
+            <p class="text-sm text-slate-500 font-medium leading-relaxed">Seulement le meilleur de chaque catégorie.</p>
+          </div>
+        </div>
+      </section>
+ 
+      <!-- Shop by Category -->
+      <section class="py-16 bg-white border-y border-slate-50">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="flex items-center justify-between mb-10">
+            <h2 class="text-3xl font-heading font-black text-slate-900">Parcourir par Catégorie</h2>
+            <a routerLink="/products" class="text-xs font-black text-shopflow-primary uppercase tracking-widest hover:underline">Voir tout le catalogue</a>
+          </div>
+          <div class="flex gap-10 overflow-x-auto pb-8 scrollbar-hide">
+            <div *ngFor="let cat of categories()" 
+                 (click)="onCategoryClick(cat.id)"
+                 class="flex-none group cursor-pointer text-center">
+              <div class="w-28 h-28 rounded-[38px] bg-slate-50 border border-slate-100 flex items-center justify-center mb-4 group-hover:bg-shopflow-primary group-hover:text-white transition-all duration-500 shadow-sm group-hover:shadow-2xl group-hover:shadow-shopflow-primary/30 group-hover:-translate-y-2 overflow-hidden">
+                <img [src]="cat.imageUrl || 'https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?q=80&w=300&auto=format&fit=crop'" 
+                     [alt]="cat.name"
+                     class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
+              </div>
+              <span class="text-sm font-bold uppercase tracking-widest text-slate-500 group-hover:text-shopflow-primary transition-colors block w-28 truncate">{{ cat.name }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Products -->
+      <section class="py-20 bg-white/50">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="flex justify-between items-end mb-12">
+            <div>
+              <span class="text-shopflow-primary font-black uppercase tracking-widest text-xs">Sélection ShopFlow</span>
+              <h2 class="text-4xl font-heading font-black text-slate-900 mt-2">Dernières Pépites</h2>
+            </div>
+            <a routerLink="/products" class="text-slate-400 hover:text-shopflow-primary font-bold text-sm flex items-center gap-2 transition-colors">
+              Tout voir <mat-icon class="!text-sm">arrow_forward</mat-icon>
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div *ngFor="let product of featuredProducts()" 
+                 class="group bg-white rounded-[40px] p-4 shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-50 cursor-pointer overflow-hidden relative"
+                 (click)="onProductClick(product.id)">
+              
+              <!-- Badge Promo -->
+              <div *ngIf="product.promoPrice" class="absolute top-8 right-8 z-10 bg-rose-500 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg">
+                PROMO
+              </div>
+
+              <!-- Image -->
+              <div class="aspect-square rounded-[32px] bg-slate-100 mb-6 overflow-hidden relative">
+                <img [src]="product.images[0] || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1999&auto=format&fit=crop'" 
+                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-500 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <span class="bg-white text-slate-900 px-6 py-2 rounded-full font-black text-xs uppercase tracking-widest shadow-2xl scale-90 group-hover:scale-100 transition-transform duration-500">
+                    Détails
+                  </span>
+                </div>
+              </div>
+
+              <!-- Details -->
+              <div class="px-2 pb-2">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Premium Quality</p>
+                <h3 class="text-xl font-black text-slate-800 mb-3 group-hover:text-shopflow-primary transition-colors line-clamp-1">
+                  {{ product.name }}
+                </h3>
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex flex-col">
+                    <span *ngIf="product.promoPrice" class="text-xs text-slate-400 line-through font-medium">{{ product.price | currency:'EUR' }}</span>
+                    <span class="text-2xl font-black text-slate-900">{{ (product.promoPrice || product.price) | currency:'EUR' }}</span>
+                  </div>
+                  <div *ngIf="!isAdminOrSeller()" class="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center group-hover:bg-shopflow-primary transition-all duration-300 shadow-lg group-hover:shadow-shopflow-primary/30">
+                    <mat-icon>shopping_bag</mat-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div *ngIf="featuredProducts().length === 0 && !loading()" class="py-24 text-center">
+            <mat-icon class="!text-8xl text-slate-200 mb-6">inventory_2</mat-icon>
+            <p class="text-slate-400 font-bold text-xl italic">Aucun produit disponible pour le moment.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="py-16 px-4">
+        <div class="max-w-5xl mx-auto rounded-[50px] bg-slate-900 p-12 md:p-20 text-center text-white shadow-2xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-shopflow-primary/20 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+          <div class="absolute bottom-0 left-0 w-64 h-64 bg-shopflow-secondary/20 rounded-full blur-[100px] -ml-32 -mb-32"></div>
+          
+          <h2 class="text-4xl md:text-5xl font-heading font-black mb-6 relative z-10">Prêt pour l'expérience ?</h2>
+          <p class="text-base text-slate-400 mb-10 max-w-2xl mx-auto font-medium relative z-10 leading-relaxed">
+            Rejoignez notre communauté exclusive et profitez de réductions exceptionnelles sur les plus grandes marques.
+          </p>
+          <div *ngIf="isGuest()" class="flex justify-center relative z-10">
+            <button mat-flat-button class="!bg-white !text-slate-900 !rounded-full !px-10 !py-5 !text-base !font-black hover:!shadow-2xl transition-all hover:scale-105" routerLink="/register">
+              Créer mon compte gratuit
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>

@@ -1,0 +1,166 @@
+<div class="animate-fade-in">
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+        <div>
+          <h1 class="text-3xl font-black text-slate-900 tracking-tight">Bonjour, Partenaire 👋</h1>
+          <p class="text-slate-500 font-medium mt-1">Voici l'état actuel de votre activité sur ShopFlow.</p>
+        </div>
+        <div class="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <mat-icon>calendar_today</mat-icon>
+          </div>
+          <div class="pr-4">
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">Aujourd'hui</p>
+            <p class="text-xs font-black text-slate-900 mt-1">{{ today | date:'dd MMMM yyyy' }}</p>
+          </div>
+        </div>
+      </div>
+      
+      @if (loading()) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div *ngFor="let i of [1,2,3,4]" class="bg-white h-32 rounded-3xl animate-pulse border border-slate-100"></div>
+        </div>
+      } @else if (error()) {
+        <div class="bg-red-50 border border-red-100 text-red-600 p-4 rounded-2xl flex items-center gap-3 mb-8 animate-shake">
+          <mat-icon>error_outline</mat-icon>
+          <span class="font-bold text-sm">{{ error() }}</span>
+        </div>
+      } @else if (stats()) {
+        <!-- Stats Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <!-- CA -->
+          <div class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <mat-icon>payments</mat-icon>
+              </div>
+              <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase tracking-widest">Temps réel</span>
+            </div>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Chiffre d'affaires</p>
+            <h2 class="text-2xl font-black text-slate-900 mt-1">{{ stats()!.totalRevenue | currency:'EUR' }}</h2>
+          </div>
+          
+          <!-- Produits -->
+          <div class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <mat-icon>inventory_2</mat-icon>
+              </div>
+            </div>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Articles en ligne</p>
+            <h2 class="text-2xl font-black text-slate-900 mt-1">{{ stats()!.totalProducts }}</h2>
+          </div>
+
+          <!-- Commandes -->
+          <div class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <mat-icon>pending_actions</mat-icon>
+              </div>
+              <span *ngIf="stats()!.pendingOrders > 0" class="flex h-3 w-3 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+              </span>
+            </div>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">À traiter</p>
+            <h2 class="text-2xl font-black text-slate-900 mt-1">{{ stats()!.pendingOrders }}</h2>
+          </div>
+
+          <!-- Alertes -->
+          <div class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <mat-icon>warning</mat-icon>
+              </div>
+            </div>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Rupture proche</p>
+            <h2 class="text-2xl font-black text-slate-900 mt-1">{{ stats()!.lowStockAlerts.length }}</h2>
+          </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Orders Table -->
+          <div class="lg:col-span-2 bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-50 flex justify-between items-center">
+              <h3 class="text-lg font-black text-slate-900">Ventes Récentes</h3>
+              <a routerLink="/dashboard/seller/orders" class="text-xs font-bold text-indigo-600 hover:underline">Tout voir</a>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50/50">
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Commande</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Statut</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Montant</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                  <tr *ngFor="let order of stats()!.recentOrders" class="hover:bg-slate-50/50 transition-colors">
+                    <td class="px-6 py-4 flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex-shrink-0">
+                        <img [src]="order.productImage || 'https://images.unsplash.com/photo-1566576721346-d4a3b4eaad5b?q=80&w=100&auto=format&fit=crop'" class="w-full h-full object-cover">
+                      </div>
+                      <span class="text-sm font-black text-slate-900">#{{ order.orderNumber }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="text-xs text-slate-500 font-medium">{{ order.createdAt | date:'dd MMM, HH:mm' }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
+                            [class.bg-amber-100]="order.status === 'PENDING'"
+                            [class.text-amber-700]="order.status === 'PENDING'"
+                            [class.bg-indigo-100]="order.status === 'PAID' || order.status === 'PROCESSING'"
+                            [class.text-indigo-700]="order.status === 'PAID' || order.status === 'PROCESSING'"
+                            [class.bg-emerald-100]="order.status === 'DELIVERED'"
+                            [class.text-emerald-700]="order.status === 'DELIVERED'">
+                        {{ order.status }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                      <span class="text-sm font-black text-slate-900">{{ order.total | currency:'EUR' }}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="stats()!.recentOrders.length === 0">
+                    <td colspan="4" class="px-6 py-10 text-center text-slate-400 italic">Aucune commande récente.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Growth/Promo Mini Card -->
+          <div class="space-y-6">
+            <div class="bg-slate-900 rounded-[32px] p-8 text-white relative overflow-hidden">
+              <mat-icon class="absolute -right-4 -bottom-4 !text-8xl opacity-10 rotate-12">trending_up</mat-icon>
+              <h4 class="text-xl font-black mb-4 leading-tight">Booster vos ventes ?</h4>
+              <p class="text-slate-400 text-sm leading-relaxed mb-6">Ajoutez des promotions à vos produits pour attirer plus de clients.</p>
+              <button routerLink="/dashboard/seller/catalog" class="bg-white text-slate-900 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-indigo-50 transition-colors w-full">Gérer mes offres</button>
+            </div>
+
+            <div class="bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm">
+              <h4 class="text-sm font-black text-slate-900 mb-6 uppercase tracking-widest">Alertes de Stock</h4>
+              <div class="space-y-4">
+                <div *ngFor="let alert of stats()!.lowStockAlerts" class="flex items-center justify-between p-3 bg-rose-50 rounded-2xl border border-rose-100 hover:scale-[1.02] transition-transform">
+                  <div class="flex flex-col">
+                    <span class="text-xs font-black text-slate-900 truncate w-32">{{ alert.productName }}</span>
+                    <span class="text-[10px] text-rose-600 font-bold uppercase">Stock: {{ alert.currentStock }}</span>
+                  </div>
+                  <mat-icon class="text-rose-400">warning</mat-icon>
+                </div>
+                <div *ngIf="stats()!.lowStockAlerts.length === 0" class="text-center py-6">
+                  <mat-icon class="text-emerald-400 mb-2">check_circle</mat-icon>
+                  <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Tout est en ordre</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="bg-yellow-50 border border-yellow-200 text-yellow-700 p-4 rounded-2xl flex items-center gap-3">
+          <mat-icon>info</mat-icon>
+          <span class="font-semibold text-sm">Aucune donnée disponible. Rechargez la page ou contactez le support.</span>
+        </div>
+      }
+    </div>

@@ -1,0 +1,186 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam class {
+    BackgroundColor #FDFDFD
+    ArrowColor #2C3E50
+    BorderColor #34495E
+    HeaderBackgroundColor #ECF0F1
+    FontName Arial
+    FontSize 12
+}
+
+skinparam enum {
+    BackgroundColor #FDFDFD
+    ArrowColor #2C3E50
+    BorderColor #34495E
+    HeaderBackgroundColor #E8F8F5
+}
+
+package "Enums" {
+    enum Role {
+        ADMIN
+        SELLER
+        CUSTOMER
+    }
+
+    enum OrderStatus {
+        PENDING
+        PAID
+        SHIPPED
+        DELIVERED
+        CANCELLED
+    }
+
+    enum CouponType {
+        PERCENT
+        FIXED
+    }
+}
+
+package "Utilisateurs & Sécurité" {
+    class User {
+        +Long id
+        +String firebaseUid
+        +String email
+        +String password
+        +String firstName
+        +String lastName
+        +Role role
+        +Boolean active
+        +LocalDateTime createdAt
+    }
+
+    class SellerProfile {
+        +Long id
+        +String storeName
+        +String description
+        +String logo
+        +Double rating
+    }
+
+    class PasswordResetToken {
+        +Long id
+        +String token
+        +LocalDateTime expiryDate
+    }
+
+    class RefreshToken {
+        +Long id
+        +String token
+        +LocalDateTime expiryDate
+        +Boolean revoked
+    }
+}
+
+package "Catalogue" {
+    class Category {
+        +Long id
+        +String name
+        +String description
+        +String imageUrl
+    }
+
+    class Product {
+        +Long id
+        +String name
+        +String description
+        +Double price
+        +Double promoPrice
+        +Integer stock
+        +Boolean active
+        +LocalDateTime createdAt
+        +List<String> images
+    }
+
+    class ProductVariant {
+        +Long id
+        +String attribute
+        +String value
+        +Integer stockAdditional
+        +Double priceDelta
+    }
+
+    class Review {
+        +Long id
+        +Integer rating
+        +String comment
+        +LocalDateTime createdAt
+    }
+}
+
+package "Ventes & Commandes" {
+    class Cart {
+        +Long id
+        +LocalDateTime updatedAt
+    }
+
+    class CartItem {
+        +Long id
+        +Integer quantity
+    }
+
+    class Order {
+        +Long id
+        +OrderStatus status
+        +String orderNumber
+        +String shippingAddress
+        +Double subTotal
+        +Double shippingCost
+        +Double total
+        +LocalDateTime createdAt
+    }
+
+    class OrderItem {
+        +Long id
+        +Integer quantity
+        +Double unitPrice
+    }
+
+    class Coupon {
+        +Long id
+        +String code
+        +CouponType type
+        +Double value
+        +LocalDateTime expirationDate
+        +Integer maxUsages
+        +Integer currentUsages
+        +Boolean active
+    }
+}
+
+' ================================
+' Relations Utilisateurs & Sécurité
+' ================================
+User "1" *-- "0..1" SellerProfile : owns
+User "1" *-- "*" RefreshToken : has
+User "1" *-- "0..1" PasswordResetToken : has
+
+' ================================
+' Relations Catalogue
+' ================================
+User "1" o-- "*" Product : sells (seller_id)
+Category "0..1" <-- "*" Category : parent
+Category "*" -- "*" Product : categorized in
+Product "1" *-- "*" ProductVariant : variants
+Product "1" *-- "*" Review : receives
+User "1" o-- "*" Review : writes (user_id)
+
+' ================================
+' Relations Panier
+' ================================
+User "1" *-- "0..1" Cart : owns
+Cart "1" *-- "*" CartItem : items
+CartItem "*" --> "1" Product : product
+CartItem "*" --> "0..1" ProductVariant : variant (optional)
+Cart "*" --> "0..1" Coupon : applies
+
+' ================================
+' Relations Commandes
+' ================================
+User "1" o-- "*" Order : places
+Order "1" *-- "*" OrderItem : items
+OrderItem "*" --> "1" Product : product
+OrderItem "*" --> "0..1" ProductVariant : variant (optional)
+
+@enduml

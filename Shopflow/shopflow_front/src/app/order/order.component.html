@@ -1,0 +1,220 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  
+  <!-- Page Header -->
+  <div class="mb-12 animate-fade-in">
+    <h1 class="text-4xl font-heading font-black text-slate-900 tracking-tight mb-2">
+      {{ authService.isAdmin() ? 'Gestion des Commandes' : 'Mes Commandes' }}
+    </h1>
+    <p class="text-slate-500 font-medium">
+      {{ authService.isAdmin() ? 'Suivi global des transactions et de la logistique plateforme.' : 'Historique de vos achats et suivi de livraison en temps réel.' }}
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-20 bg-white/50 rounded-[40px] border border-dashed border-slate-200">
+    <div class="animate-spin text-shopflow-primary mb-4">
+      <mat-icon class="text-4xl w-10 h-10">autorenew</mat-icon>
+    </div>
+    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">
+      {{ authService.isAdmin() ? 'Récupération de toutes les commandes...' : 'Récupération de vos commandes...' }}
+    </p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="bg-red-50 border border-red-100 text-red-600 p-6 rounded-3xl mb-8 flex items-center gap-4 animate-shake">
+    <mat-icon>error_outline</mat-icon>
+    <span class="font-medium">{{ error }}</span>
+  </div>
+
+  <!-- Orders Grid/List -->
+  <div *ngIf="!loading && orders.length > 0" class="space-y-6">
+    <div *ngFor="let order of orders" 
+      class="group bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300">
+      
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        
+        <!-- Order Identity -->
+        <div class="flex items-center gap-5">
+          <div class="w-14 h-14 rounded-2xl bg-slate-50 text-slate-400 group-hover:bg-shopflow-primary/10 group-hover:text-shopflow-primary transition-colors flex items-center justify-center shadow-inner overflow-hidden border border-slate-100">
+            <img *ngIf="order.productImage" [src]="order.productImage" [alt]="order.orderNumber" class="w-full h-full object-cover">
+            <mat-icon *ngIf="!order.productImage" class="text-3xl">receipt_long</mat-icon>
+          </div>
+          <div>
+            <p class="text-lg font-bold text-slate-800">{{ order.orderNumber }}</p>
+            <div class="flex items-center gap-2">
+              <p class="text-xs text-slate-400 font-medium uppercase tracking-widest">{{ order.createdAt | date:'longDate' }}</p>
+              <span *ngIf="authService.isAdmin()" class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-bold">
+                Client: {{ order.customerEmail || '#' + order.customerId }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status & Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-8 lg:gap-16">
+          <div class="flex flex-col">
+            <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Statut</span>
+            <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest w-fit shadow-sm"
+              [ngClass]="getStatusClass(order.status)">
+              {{ statusLabels[order.status] }}
+            </span>
+          </div>
+          
+          <div class="flex flex-col">
+            <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Articles</span>
+            <span class="text-sm font-bold text-slate-600">{{ getTotalItems(order) }} Produits</span>
+          </div>
+
+          <div class="flex flex-col">
+            <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Montant</span>
+            <span class="text-lg font-black text-slate-900">{{ order.total | currency:'EUR' }}</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-3">
+          <button (click)="viewDetail(order)"
+            class="btn-premium btn-premium-outline">
+            Détails
+          </button>
+          <button *ngIf="!authService.isAdmin() && (order.status === 'PENDING' || order.status === 'PAID')"
+            (click)="cancelOrder(order.id)"
+            class="btn-premium btn-premium-danger">
+            Annuler
+          </button>
+          <button class="w-12 h-12 flex items-center justify-center text-slate-300 hover:text-shopflow-primary transition-colors">
+            <mat-icon>download</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && orders.length === 0" class="flex flex-col items-center justify-center py-32 bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
+    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center text-slate-200 mb-6 shadow-inner">
+      <mat-icon class="scale-[2.5]">{{ authService.isAdmin() ? 'inventory_2' : 'shopping_bag' }}</mat-icon>
+    </div>
+    <h3 class="text-xl font-bold text-slate-400">Aucune commande</h3>
+    <p class="text-slate-500 mt-2 mb-8">
+      {{ authService.isAdmin() ? 'Aucune transaction n’a été enregistrée sur la plateforme pour le moment.' : 'Vos futurs achats apparaîtront ici.' }}
+    </p>
+    <a *ngIf="!authService.isAdmin()" routerLink="/products" class="bg-shopflow-primary text-white px-10 py-4 rounded-2xl font-bold shadow-xl shadow-shopflow-primary/30 hover:scale-105 transition-transform">
+      Aller au catalogue
+    </a>
+  </div>
+
+  <!-- Detail Modal (Overlay) -->
+  <div *ngIf="selectedOrder" 
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-fade-in"
+    (click)="closeDetail()">
+    
+    <div class="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl overflow-hidden animate-slide-up" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-shopflow-primary font-bold">
+            #
+          </div>
+          <div>
+            <h3 class="text-xl font-black text-slate-900">{{ selectedOrder.orderNumber }}</h3>
+            <span class="text-xs text-slate-400 font-medium">Commande effectuée le {{ selectedOrder.createdAt | date:'longDate' }}</span>
+          </div>
+        </div>
+        <button (click)="closeDetail()" class="w-10 h-10 rounded-full hover:bg-slate-200 flex items-center justify-center transition-colors">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        
+        <div class="grid grid-cols-2 gap-8 mb-10">
+          <div class="flex flex-col gap-1">
+            <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Statut actuel</span>
+            <span class="text-sm font-bold flex items-center gap-2" [ngClass]="getStatusClass(selectedOrder.status)">
+              <mat-icon class="scale-75">circle</mat-icon>
+              {{ statusLabels[selectedOrder.status] }}
+            </span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Adresse de livraison</span>
+            <span class="text-sm font-bold text-slate-600">{{ selectedOrder.shippingAddress }}</span>
+          </div>
+        </div>
+
+        <!-- Admin: Modifier le statut -->
+        <div *ngIf="authService.isAdmin()" class="mb-10 p-6 bg-slate-50 rounded-[32px] border border-slate-100 animate-slide-up">
+          <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <mat-icon class="text-sm">edit_notifications</mat-icon>
+            Modifier le statut de la commande
+          </h4>
+          <div class="flex flex-wrap gap-2">
+            <button *ngFor="let status of allStatuses"
+              (click)="updateStatus(selectedOrder, status)"
+              [disabled]="updatingStatus || selectedOrder.status === status"
+              class="btn-premium !text-[9px] !px-3 !py-1.5"
+              [ngClass]="selectedOrder.status === status ? 
+                'bg-indigo-600 text-white' : 
+                'bg-white text-slate-500 border border-slate-100'">
+              {{ statusLabels[status] }}
+            </button>
+          </div>
+          <p *ngIf="updatingStatus" class="text-[10px] text-shopflow-primary font-bold mt-3 animate-pulse">Mise à jour en cours...</p>
+        </div>
+
+        <h4 class="text-xs font-black text-slate-300 uppercase tracking-widest mb-4">Détail des articles</h4>
+        <div class="space-y-4 mb-8">
+          <div *ngFor="let item of selectedOrder.items" class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-xs font-black text-slate-900 overflow-hidden shadow-sm">
+                <img *ngIf="item.productImage" [src]="item.productImage" [alt]="item.productName" class="w-full h-full object-cover">
+                <mat-icon *ngIf="!item.productImage" class="text-slate-200">image</mat-icon>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-slate-800">{{ item.productName }}</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-bold">Qté: {{ item.quantity }}</span>
+                  <p class="text-[10px] text-slate-400 font-medium uppercase tracking-tighter" *ngIf="item.variant">{{ item.variant }}</p>
+                </div>
+              </div>
+            </div>
+            <span class="text-sm font-black text-slate-900">{{ item.quantity * item.unitPrice | currency:'EUR' }}</span>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="bg-slate-900 p-8 rounded-[32px] text-white shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+          
+          <div class="space-y-3 relative z-10">
+            <div class="flex justify-between text-sm opacity-60">
+              <span>Sous-total</span>
+              <span>{{ selectedOrder.subTotal | currency:'EUR' }}</span>
+            </div>
+            <div class="flex justify-between text-sm opacity-60">
+              <span>Livraison</span>
+              <span>{{ selectedOrder.shippingCost | currency:'EUR' }}</span>
+            </div>
+            <div class="pt-4 border-t border-white/10 flex justify-between items-center mt-4">
+              <span class="font-bold text-lg">Total TTC</span>
+              <span class="text-3xl font-black text-shopflow-secondary">{{ selectedOrder.total | currency:'EUR' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-8 border-t border-slate-50 flex gap-4">
+        <button class="flex-1 btn-premium btn-premium-outline py-4" (click)="closeDetail()">
+          Fermer
+        </button>
+        <button class="flex-1 btn-premium btn-premium-primary py-4 shadow-xl">
+          Facture
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

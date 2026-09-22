@@ -1,0 +1,126 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+    <div>
+      <h1 class="text-4xl font-heading font-black text-slate-900 tracking-tight mb-2">Rayons & Catégories</h1>
+      <p class="text-slate-500 font-medium max-w-xl">
+        Explorez notre univers organisé par thématiques pour trouver exactement ce que vous cherchez.
+      </p>
+    </div>
+    
+    <!-- Bouton Création (ADMIN/SELLER uniquement) -->
+    <button *ngIf="isAdminOrSeller && !showForm" (click)="openCreateForm()"
+      class="btn-premium btn-premium-primary">
+      <mat-icon>add_circle</mat-icon> Nouveau Rayon
+    </button>
+  </div>
+
+  <!-- Formulaire de Création/Edition (ADMIN/SELLER uniquement) -->
+  <div *ngIf="showForm && isAdminOrSeller" class="glass p-8 rounded-[32px] mb-12 shadow-2xl border border-white/40 animate-slide-up">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-shopflow-primary/10 text-shopflow-primary flex items-center justify-center">
+        <mat-icon>{{ editingCategory ? 'edit' : 'add_shopping_cart' }}</mat-icon>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-800">{{ editingCategory ? 'Modifier' : 'Ajouter' }} une catégorie</h2>
+    </div>
+
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Nom du rayon</label>
+        <input type="text" formControlName="name" 
+          class="bg-white/50 border border-slate-200 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-shopflow-primary/20 transition-all text-slate-700"
+          placeholder="Ex: Électronique Haute Performance">
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Rayon Parent</label>
+        <select formControlName="parentId" 
+          class="bg-white/50 border border-slate-200 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-shopflow-primary/20 transition-all text-slate-700 appearance-none">
+          <option [ngValue]="null">Aucun (Catégorie Racine)</option>
+          <option *ngFor="let cat of categories" [ngValue]="cat.id" [disabled]="editingCategory?.id === cat.id">
+            {{ cat.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="md:col-span-2 flex flex-col gap-2">
+        <label class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Description détaillée</label>
+        <textarea formControlName="description" rows="3"
+          class="bg-white/50 border border-slate-200 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-shopflow-primary/20 transition-all text-slate-700"
+          placeholder="Décrivez les types de produits présents dans ce rayon..."></textarea>
+      </div>
+
+      <div class="md:col-span-2 flex justify-end gap-4 mt-4">
+        <button type="button" (click)="cancelForm()" class="btn-premium btn-premium-outline">Annuler</button>
+        <button type="submit" [disabled]="categoryForm.invalid || submitting"
+          class="btn-premium btn-premium-primary">
+          {{ submitting ? 'Enregistrement...' : 'Valider' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex flex-col items-center py-20">
+    <div class="animate-spin text-shopflow-primary mb-4">
+      <mat-icon class="text-4xl w-10 h-10">autorenew</mat-icon>
+    </div>
+    <p class="text-slate-500 font-medium tracking-tight">Analyse du catalogue en cours...</p>
+  </div>
+
+  <!-- Categories Grid -->
+  <div *ngIf="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div *ngFor="let cat of categories" 
+      class="group bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">
+      
+      <div class="flex justify-between items-start mb-6">
+        <div class="w-14 h-14 rounded-2xl bg-slate-50 text-slate-400 group-hover:bg-shopflow-primary/10 group-hover:text-shopflow-primary transition-colors flex items-center justify-center">
+          <mat-icon class="text-3xl">{{ cat.parentId ? 'subdirectory_arrow_right' : 'folder' }}</mat-icon>
+        </div>
+        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
+          [class]="cat.parentId ? 'bg-slate-100 text-slate-500' : 'bg-shopflow-primary/10 text-shopflow-primary'">
+          {{ cat.parentId ? 'Sous-rayon' : 'Rayon Principal' }}
+        </span>
+      </div>
+      
+      <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-shopflow-primary transition-colors">{{ cat.name }}</h3>
+      <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-1">
+        {{ cat.description || 'Découvrez tous nos produits sélectionnés avec soin dans cette catégorie.' }}
+      </p>
+
+      <div *ngIf="cat.parentId" class="flex items-center gap-2 mb-6 text-xs text-slate-400 italic">
+        <mat-icon class="text-xs">layers</mat-icon>
+        Parent : <span class="font-bold text-slate-600">{{ getParentName(cat.parentId) }}</span>
+      </div>
+
+      <!-- Actions (ADMIN/SELLER uniquement) -->
+      <div *ngIf="isAdminOrSeller" class="flex items-center gap-2 pt-6 border-t border-slate-50 mt-auto">
+        <button (click)="openEditForm(cat)" 
+          class="flex-1 btn-premium btn-premium-outline !py-3">
+          Modifier
+        </button>
+        <button (click)="onDelete(cat.id)" 
+          class="btn-premium btn-premium-danger !w-12 !h-12 !p-0">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </div>
+
+      <!-- Lien Catalogue pour CUSTOMER -->
+      <div *ngIf="!isAdminOrSeller" class="pt-6 border-t border-slate-50 mt-auto">
+        <a [routerLink]="['/products']" [queryParams]="{categoryId: cat.id}"
+          class="w-full flex items-center justify-center gap-2 py-3 bg-shopflow-primary/5 hover:bg-shopflow-primary text-shopflow-primary hover:text-white rounded-xl transition-all font-bold text-sm">
+          Voir les produits <mat-icon>arrow_forward</mat-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && categories.length === 0" class="flex flex-col items-center py-32 bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
+    <mat-icon class="text-6xl text-slate-300 mb-4 scale-150">category</mat-icon>
+    <p class="text-slate-400 font-bold text-xl">Aucune catégorie trouvée</p>
+  </div>
+</div>
+
+

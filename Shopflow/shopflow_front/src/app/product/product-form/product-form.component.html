@@ -1,0 +1,185 @@
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  
+  <!-- Header -->
+  <div class="mb-12 animate-fade-in">
+    <div class="flex items-center gap-4 mb-4">
+      <a routerLink="/products" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-shopflow-primary transition-colors">
+        <mat-icon>arrow_back</mat-icon>
+      </a>
+      <span class="text-xs font-black uppercase tracking-[0.2em] text-shopflow-primary">Catalogue</span>
+    </div>
+    <h1 class="text-4xl font-heading font-black text-slate-900 tracking-tight mb-2">
+      {{ isEditMode ? 'Modifier le Produit' : 'Nouveau Produit' }}
+    </h1>
+    <p class="text-slate-500 font-medium">Configurez les détails, les prix et les variantes de votre article.</p>
+  </div>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-8">
+    
+    <!-- Erreurs -->
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-100 text-red-600 p-6 rounded-3xl flex items-center gap-4 animate-shake">
+      <mat-icon>error_outline</mat-icon>
+      <span class="font-medium">{{ errorMessage }}</span>
+    </div>
+
+    <!-- Section 1: Infos Générales -->
+    <div class="glass p-8 rounded-[40px] shadow-xl border border-white/40 space-y-6">
+      <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3 mb-6">
+        <span class="w-8 h-8 rounded-lg bg-indigo-50 text-shopflow-primary flex items-center justify-center">
+          <mat-icon class="text-sm">info</mat-icon>
+        </span>
+        Informations Générales
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-2 md:col-span-2">
+          <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Nom du produit</label>
+          <input type="text" formControlName="name" placeholder="Ex: Casque Audio Arctic Pro"
+            class="w-full bg-white/50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-4 focus:ring-shopflow-primary/10 focus:border-shopflow-primary transition-all font-medium text-slate-800">
+        </div>
+
+        <div class="space-y-2 md:col-span-2">
+          <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Description</label>
+          <textarea formControlName="description" rows="4" placeholder="Décrivez votre produit en quelques mots..."
+            class="w-full bg-white/50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-4 focus:ring-shopflow-primary/10 focus:border-shopflow-primary transition-all font-medium text-slate-800"></textarea>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Prix de base (€)</label>
+          <input type="number" formControlName="price"
+            class="w-full bg-white/50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-4 focus:ring-shopflow-primary/10 focus:border-shopflow-primary transition-all font-bold text-slate-800">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1 text-shopflow-secondary">Prix Promo (€) - Optionnel</label>
+          <input type="number" formControlName="promoPrice"
+            class="w-full bg-white/50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-4 focus:ring-shopflow-secondary/10 focus:border-shopflow-secondary transition-all font-bold text-slate-800">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Stock initial</label>
+          <input type="number" formControlName="stock"
+            class="w-full bg-white/50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-4 focus:ring-shopflow-primary/10 focus:border-shopflow-primary transition-all font-bold text-slate-800">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Catégories -->
+    <div class="glass p-8 rounded-[40px] shadow-xl border border-white/40">
+      <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3 mb-6">
+        <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center">
+          <mat-icon class="text-sm">category</mat-icon>
+        </span>
+        Catégories
+      </h2>
+      
+      <div class="flex flex-wrap gap-3">
+        <label *ngFor="let cat of categories" 
+          class="relative flex items-center gap-3 px-6 py-3 rounded-2xl border-2 cursor-pointer transition-all font-bold text-sm"
+          [ngClass]="isCategorySelected(cat.id) ? 'bg-shopflow-primary border-shopflow-primary text-white shadow-lg shadow-shopflow-primary/30' : 'bg-white/50 border-slate-100 text-slate-500 hover:border-shopflow-primary/30'">
+          <input type="checkbox" class="hidden" [checked]="isCategorySelected(cat.id)" (change)="onCategoryChange($event, cat.id)">
+          {{ cat.name }}
+          <mat-icon *ngIf="isCategorySelected(cat.id)" class="text-sm">check_circle</mat-icon>
+        </label>
+      </div>
+    </div>
+
+    <!-- Section 3: Images -->
+    <div class="glass p-8 rounded-[40px] shadow-xl border border-white/40">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+          <span class="w-8 h-8 rounded-lg bg-pink-50 text-shopflow-secondary flex items-center justify-center">
+            <mat-icon class="text-sm">image</mat-icon>
+          </span>
+          Images du produit
+        </h2>
+        <button type="button" (click)="addImage()" class="text-shopflow-secondary font-black text-xs uppercase tracking-widest hover:underline flex items-center gap-1">
+          <mat-icon class="text-sm">add</mat-icon> Ajouter une URL
+        </button>
+      </div>
+
+      <div formArrayName="images" class="space-y-4">
+        <div *ngFor="let imgCtrl of images.controls; let i = index" class="flex gap-3 animate-slide-up">
+          <div class="flex-1 relative">
+            <input [formControlName]="i" type="text" placeholder="URL de l'image (https://...)"
+              class="w-full bg-white/50 border border-slate-100 rounded-2xl px-6 py-4 outline-none focus:ring-4 focus:ring-shopflow-secondary/10 focus:border-shopflow-secondary transition-all font-medium text-slate-600 pr-12">
+            <mat-icon class="absolute right-4 top-4 text-slate-200">link</mat-icon>
+          </div>
+          <button type="button" (click)="removeImage(i)" *ngIf="images.length > 1"
+            class="w-14 h-14 rounded-2xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Variantes -->
+    <div class="glass p-8 rounded-[40px] shadow-xl border border-white/40">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+          <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center">
+            <mat-icon class="text-sm">layers</mat-icon>
+          </span>
+          Variantes (Taille, Couleur, etc.)
+        </h2>
+        <button type="button" (click)="addVariant()" class="text-amber-500 font-black text-xs uppercase tracking-widest hover:underline flex items-center gap-1">
+          <mat-icon class="text-sm">add</mat-icon> Nouvelle variante
+        </button>
+      </div>
+
+      <div formArrayName="variants" class="space-y-6">
+        <div *ngFor="let v of variants.controls; let i = index" [formGroupName]="i" 
+          class="bg-white/50 p-6 rounded-[32px] border border-slate-100 flex flex-wrap lg:flex-nowrap gap-4 items-end animate-slide-up relative">
+          
+          <div class="flex-1 space-y-2 min-w-[150px]">
+            <label class="text-[10px] font-black uppercase tracking-tighter text-slate-400">Attribut</label>
+            <input formControlName="attribute" placeholder="Ex: Couleur"
+              class="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/20 font-bold text-slate-800">
+          </div>
+
+          <div class="flex-1 space-y-2 min-w-[150px]">
+            <label class="text-[10px] font-black uppercase tracking-tighter text-slate-400">Valeur</label>
+            <input formControlName="value" placeholder="Ex: Bleu Polaire"
+              class="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/20 font-bold text-slate-800">
+          </div>
+
+          <div class="w-32 space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-tighter text-slate-400">Stock Sup.</label>
+            <input type="number" formControlName="stockAdditional"
+              class="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/20 font-bold text-slate-800">
+          </div>
+
+          <div class="w-32 space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-tighter text-slate-400">Prix Diff. (€)</label>
+            <input type="number" formControlName="priceDelta"
+              class="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/20 font-bold text-slate-800">
+          </div>
+
+          <button type="button" (click)="removeVariant(i)"
+            class="w-12 h-12 rounded-xl bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
+            <mat-icon class="text-sm">close</mat-icon>
+          </button>
+        </div>
+      </div>
+      
+      <p *ngIf="variants.length === 0" class="text-center text-slate-300 py-10 font-medium italic">
+        Aucune variante définie pour ce produit.
+      </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-4 pt-6">
+      <button type="button" routerLink="/products" 
+        class="px-10 py-5 rounded-[24px] font-black text-slate-400 hover:text-slate-600 transition-colors">
+        Annuler
+      </button>
+      <button type="submit" [disabled]="submitting"
+        class="bg-shopflow-primary text-white px-16 py-5 rounded-[24px] font-black text-lg shadow-xl shadow-shopflow-primary/30 hover:scale-[1.03] transition-all disabled:opacity-50 flex items-center gap-3">
+        {{ submitting ? 'Enregistrement...' : (isEditMode ? 'Mettre à jour' : 'Publier le produit') }}
+        <mat-icon *ngIf="!submitting">rocket_launch</mat-icon>
+        <mat-icon *ngIf="submitting" class="animate-spin">autorenew</mat-icon>
+      </button>
+    </div>
+
+  </form>
+</div>

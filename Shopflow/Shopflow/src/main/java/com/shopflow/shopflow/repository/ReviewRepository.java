@@ -1,0 +1,15 @@
+package com.shopflow.shopflow.repository;
+
+import com.shopflow.shopflow.entity.Review;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface ReviewRepository extends JpaRepository<Review, Long> {
+
+    List<Review> findByProductId(Long productId);
+
+    List<Review> findByUserId(Long userId);
+
+    List<Review> findTop5ByUserIdOrderByCreatedAtDesc(Long userId);
+}

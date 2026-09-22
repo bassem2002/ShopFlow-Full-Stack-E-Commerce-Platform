@@ -1,0 +1,28 @@
+<div class="h-screen bg-slate-50 flex flex-col font-sans text-slate-900 overflow-hidden">
+
+  <!-- Barre de progression de chargement -->
+  @if (isLoading) {
+  <div
+    class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-shopflow-primary to-shopflow-secondary z-[60] animate-pulse">
+  </div>
+  }
+
+  <!-- Navbar Dynamique -->
+  <app-navbar></app-navbar>
+
+  <!-- Zone de contenu principale -->
+  <main class="flex-1 relative pt-[72px] overflow-y-auto scrollbar-hide">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer minimaliste -->
+  <!-- Footer minimaliste -->
+  <footer class="bg-white border-t border-slate-100 py-2 flex-none">
+    <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+      <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+        © 2026 ShopFlow
+      </p>
+      <span class="text-shopflow-primary text-[10px] font-black uppercase tracking-widest">Premium Edition</span>
+    </div>
+  </footer>
+</div>
